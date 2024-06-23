@@ -116,7 +116,7 @@ def get_base_stats_changes(patch_note_page, champion):
           if next.text.strip() in base_stats_tag:
                base_stats_list = next.find_next_sibling()
                if base_stats_list.name == 'ul':
-                    base_stats_changes.extend([li.text.strip() for li in base.find_all('li')])
+                    base_stats_changes.extend([li.text.strip() for li in base_stats_list.find_all('li')])
                     break
           next = next.find_next_sibling()
 
