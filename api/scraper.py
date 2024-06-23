@@ -1,5 +1,6 @@
 import requests
 import bs4 
+import pprint
 
 def retrieve_page(url):
      
@@ -55,24 +56,72 @@ def get_champion_changes(patch_note_page):
      
      champions = get_champions()
      
-     champion_changes = []
+     champion_changes = {}
+     base_stats_changes = []
+     passive_changes = []
+     q_ability_changes = []
+     w_ability_changes = []
+     e_ability_changes = []
+     r_ability_changes = []
+          
      h2_tag = patch_note_page.find('h2', text='Champions')
      
      if h2_tag:
           next_sibling = h2_tag.find_next_sibling()
           while next_sibling:
                if (next_sibling.name == "h3") and (next_sibling.text.strip() in champions):
-                    champion_changes.append(next_sibling.text.strip())
+                    
+                    champion = next_sibling.text.strip()
+                    champion_changes[champion] = {
+                        'base_stats': [],
+                        'passive': [],
+                        'q_ability': [],
+                        'w_ability': [],
+                        'e_ability': [],
+                        'r_ability': []
+                    }
+                    
+                    champion_changes[next_sibling.text.strip()]['base_stats'] = get_base_stats_changes(patch_note_page, champion)
+
                next_sibling = next_sibling.find_next_sibling()
                                
      if not champion_changes: 
           changes = patch_note_page.find_all("h3", class_="change-title")
           for change in changes:
                if change.text.strip() in champions:
-                    champion_changes.append(change.text.strip())
+                    champion_changes[change.text.strip()] = {
+                        'base_stats': [],
+                        'passive': [],
+                        'q_ability': [],
+                        'w_ability': [],
+                        'e_ability': [],
+                        'r_ability': []
+                    }
+                    
+                    
      
      return champion_changes
 
+def get_base_stats_changes(patch_note_page, champion):
+     
+     base_stats_changes = []
+     
+     champion_tag = patch_note_page.find('h3', text=champion)
+     
+     base_stats_tag = ["Base Stats"]
+     end_tags = ["img"]    
+          
+     next = champion_tag.find_next_sibling()
+     while next.name not in end_tags:
+          if next.text.strip() in base_stats_tag:
+               base_stats_list = next.find_next_sibling()
+               if base_stats_list.name == 'ul':
+                    base_stats_changes.extend([li.text.strip() for li in base.find_all('li')])
+                    break
+          next = next.find_next_sibling()
+
+     return base_stats_changes
+     
 def get_item_changes(patch_note_page):
      
      patch_note_page = retrieve_page(patch_note_page)
@@ -107,11 +156,11 @@ def main():
      
      patch_note_links = get_patch_notes()
      
-     for link in patch_note_links:
+     for link in patch_note_links[0:1]:
           print(get_title(link))
           print(get_datePosted(link))
           print("Champion Changes")
-          print(get_champion_changes(link))
+          pprint.pprint(get_champion_changes(link))
           print("Item Changes")
           print(get_item_changes(link))
           print("")
