@@ -57,14 +57,37 @@ def get_champion_changes(patch_note_page):
                     champion_changes.append(next_sibling.text.strip())
                next_sibling = next_sibling.find_next_sibling()
                                
-     # champions = patch_note_page.select("h3 > a[rel='noopener noreferrer nofollow']")
-     
-     # if not champions:
-     #           champions = patch_note_page.find_all("h3", class_="change-title")
-               
-     # champions = [champion.text.strip() for champion in champions]
+     if not champion_changes: 
+          changes = patch_note_page.find_all("h3", class_="change-title")
+          for change in changes:
+               if change.text.strip() in champions:
+                    champion_changes.append(change.text.strip())
      
      return champion_changes
+
+def get_item_changes(patch_note_page):
+     
+     patch_note_page = retrieve_page(patch_note_page)
+     
+     champions = get_champions()
+     
+     item_changes = []
+     h2_tag = patch_note_page.find('h2', text='Items')
+     
+     if h2_tag: 
+          next_sibling = h2_tag.find_next_sibling()
+          while next_sibling:
+               if (next_sibling.name == "h3") and (next_sibling.text.strip() not in champions):
+                    item_changes.append(next_sibling.text.strip())
+               next_sibling = next_sibling.find_next_sibling()
+
+     if not item_changes:
+          changes = patch_note_page.find_all("h3", class_="change-title")
+          for change in changes:
+               if change.text.strip() not in champions:
+                    item_changes.append(change.text.strip())
+                    
+     return item_changes
 
 def main():
      
@@ -73,7 +96,10 @@ def main():
      for link in patch_note_links:
           print(get_title(link))
           print(get_datePosted(link))
+          print("Champion Changes")
           print(get_champion_changes(link))
+          print("Item Changes")
+          print(get_item_changes(link))
           print("")
           
 if __name__ == "__main__":
