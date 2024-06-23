@@ -94,6 +94,12 @@ def get_item_changes(patch_note_page):
           for change in changes:
                if change.text.strip() in items:
                     item_changes.append(change.text.strip())
+     
+     if not item_changes:
+          changes = patch_note_page.find_all("h4", class_="change-detail-title ability-title")
+          for change in changes:
+               if change.text.strip().title() in items:
+                    item_changes.append(change.text.strip().title())
                     
      return item_changes
 
