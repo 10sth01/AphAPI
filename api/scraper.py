@@ -40,6 +40,14 @@ def get_champions():
      champions = [champion.get('aria-label') for champion in champions]
      
      return champions
+
+def get_items():
+     
+     items_page = retrieve_page('https://leagueoflegends.fandom.com/wiki/List_of_items')
+     items = items_page.find_all("div", class_="item-icon")
+     items = [item.get('data-item') for item in items]
+     
+     return items
      
 def get_champion_changes(patch_note_page):
      
@@ -69,7 +77,7 @@ def get_item_changes(patch_note_page):
      
      patch_note_page = retrieve_page(patch_note_page)
      
-     champions = get_champions()
+     items = get_items()
      
      item_changes = []
      h2_tag = patch_note_page.find('h2', text='Items')
@@ -77,14 +85,14 @@ def get_item_changes(patch_note_page):
      if h2_tag: 
           next_sibling = h2_tag.find_next_sibling()
           while next_sibling:
-               if (next_sibling.name == "h3") and (next_sibling.text.strip() not in champions):
+               if (next_sibling.name == "h3") and (next_sibling.text.strip() in items):
                     item_changes.append(next_sibling.text.strip())
                next_sibling = next_sibling.find_next_sibling()
 
      if not item_changes:
           changes = patch_note_page.find_all("h3", class_="change-title")
           for change in changes:
-               if change.text.strip() not in champions:
+               if change.text.strip() in items:
                     item_changes.append(change.text.strip())
                     
      return item_changes
