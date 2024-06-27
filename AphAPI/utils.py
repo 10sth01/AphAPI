@@ -156,7 +156,7 @@ def main():
      
      patch_note_links = get_patch_notes()
      
-     for link in patch_note_links[0:1]:
+     for link in patch_note_links:
           print(get_title(link))
           print(get_datePosted(link))
           print("Champion Changes")
