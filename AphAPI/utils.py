@@ -1,6 +1,7 @@
 import requests
 import bs4 
 import pprint
+import re
 
 def retrieve_page(url):
      
@@ -28,6 +29,11 @@ def get_title(patch_note_page):
      
      patch_note_page = retrieve_page(patch_note_page)
      return patch_note_page.find('h1', class_='title').text.strip()
+
+def get_patch_notes_num(patch_note_page):
+     
+     num = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[\.]?\d*(?:[eE][-+]?\d+)?", get_title(patch_note_page))
+     return float(num[0])
 
 def get_datePosted(patch_note_page): 
                
@@ -57,12 +63,6 @@ def get_champion_changes(patch_note_page):
      champions = get_champions()
      
      champion_changes = {}
-     base_stats_changes = []
-     passive_changes = []
-     q_ability_changes = []
-     w_ability_changes = []
-     e_ability_changes = []
-     r_ability_changes = []
           
      h2_tag = patch_note_page.find('h2', text='Champions')
      
@@ -97,9 +97,7 @@ def get_champion_changes(patch_note_page):
                         'e_ability': [],
                         'r_ability': []
                     }
-                    
-                    
-     
+                        
      return champion_changes
 
 def get_base_stats_changes(patch_note_page, champion):
@@ -129,7 +127,7 @@ def get_item_changes(patch_note_page):
      items = get_items()
      
      item_changes = []
-     h2_tag = patch_note_page.find('h2', text='Items')
+     h2_tag = patch_note_page.find('h2', string='Items')
      
      if h2_tag: 
           next_sibling = h2_tag.find_next_sibling()
@@ -156,8 +154,9 @@ def main():
      
      patch_note_links = get_patch_notes()
      
-     for link in patch_note_links:
+     for link in patch_note_links[0:1]:
           print(get_title(link))
+          print(get_patch_notes_num(link))
           print(get_datePosted(link))
           print("Champion Changes")
           pprint.pprint(get_champion_changes(link))
