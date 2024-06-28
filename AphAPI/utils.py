@@ -1,6 +1,7 @@
 import requests
 import bs4 
 import pprint
+import re
 
 def retrieve_page(url):
      
@@ -28,6 +29,13 @@ def get_title(patch_note_page):
      
      patch_note_page = retrieve_page(patch_note_page)
      return patch_note_page.find('h1', class_='title').text.strip()
+
+def get_patch_note_num(patch_note_page):
+     
+     title = get_title(patch_note_page)
+     patch_num = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[\.]?\d*(?:[eE][-+]?\d+)?", title)
+     
+     return float(patch_num[0])
 
 def get_datePosted(patch_note_page): 
                
@@ -64,7 +72,7 @@ def get_champion_changes(patch_note_page):
      e_ability_changes = []
      r_ability_changes = []
           
-     h2_tag = patch_note_page.find('h2', text='Champions')
+     h2_tag = patch_note_page.find('h2', string='Champions')
      
      if h2_tag:
           next_sibling = h2_tag.find_next_sibling()
@@ -89,6 +97,7 @@ def get_champion_changes(patch_note_page):
           changes = patch_note_page.find_all("h3", class_="change-title")
           for change in changes:
                if change.text.strip() in champions:
+                    champion = change.text.strip()
                     champion_changes[change.text.strip()] = {
                         'base_stats': [],
                         'passive': [],
@@ -97,6 +106,7 @@ def get_champion_changes(patch_note_page):
                         'e_ability': [],
                         'r_ability': []
                     }
+                    champion_changes[change.text.strip()]['base_stats'] = get_base_stats_changes(patch_note_page, champion)
                     
                     
      
@@ -105,20 +115,27 @@ def get_champion_changes(patch_note_page):
 def get_base_stats_changes(patch_note_page, champion):
      
      base_stats_changes = []
+     champion_tag = patch_note_page.find('h3', string=champion)
      
-     champion_tag = patch_note_page.find('h3', text=champion)
+     if not champion_tag:
+          champion_tag = patch_note_page.find('h3.a', string=champion)
+     if not champion_tag:
+          champion_tag = "Champion tag not found"
      
-     base_stats_tag = ["Base Stats"]
-     end_tags = ["img"]    
+     base_stats_tag = ["Base Stats", "Base States"]
+     end_tags = ["img", "content-border"]   
+     
+     next = champion_tag.next_element
+     while (next.name not in end_tags):
           
-     next = champion_tag.find_next_sibling()
-     while next.name not in end_tags:
-          if next.text.strip() in base_stats_tag:
-               base_stats_list = next.find_next_sibling()
-               if base_stats_list.name == 'ul':
-                    base_stats_changes.extend([li.text.strip() for li in base_stats_list.find_all('li')])
-                    break
-          next = next.find_next_sibling()
+          if (next.string in base_stats_tag):
+               while (next.name != 'ul'):
+                    next = next.next_element
+                    if next.name == 'ul':
+                         base_stats_changes.extend([li.text for li in next.find_all('li')])
+                         break
+                    
+          next = next.next_element
 
      return base_stats_changes
      
@@ -129,7 +146,7 @@ def get_item_changes(patch_note_page):
      items = get_items()
      
      item_changes = []
-     h2_tag = patch_note_page.find('h2', text='Items')
+     h2_tag = patch_note_page.find('h2', string='Items')
      
      if h2_tag: 
           next_sibling = h2_tag.find_next_sibling()
@@ -156,7 +173,7 @@ def main():
      
      patch_note_links = get_patch_notes()
      
-     for link in patch_note_links:
+     for link in patch_note_links[0:1]:
           print(get_title(link))
           print(get_datePosted(link))
           print("Champion Changes")
