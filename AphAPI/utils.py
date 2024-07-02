@@ -85,6 +85,7 @@ def get_champion_changes(patch_note_page):
                     
                     champion = next_sibling.text.strip()
                     champion_changes[champion] = {
+                        'description': [],
                         'base_stats': [],
                         'passive': [],
                         'q_ability': [],
@@ -93,6 +94,7 @@ def get_champion_changes(patch_note_page):
                         'r_ability': []
                     }
                     
+                    champion_changes[next_sibling.text.strip()]['description'] = get_description_changes(patch_note_page, champion)
                     champion_changes[next_sibling.text.strip()]['base_stats'] = get_base_stats_changes(patch_note_page, champion)
                     champion_changes[next_sibling.text.strip()]['passive'] = get_passive_changes(patch_note_page, champion)
                     champion_changes[next_sibling.text.strip()]['q_ability'] = get_q_changes(patch_note_page, champion)
@@ -108,6 +110,7 @@ def get_champion_changes(patch_note_page):
                if change.text.strip() in champions:
                     champion = change.text.strip()
                     champion_changes[change.text.strip()] = {
+                        'description': [],
                         'base_stats': [],
                         'passive': [],
                         'q_ability': [],
@@ -116,13 +119,13 @@ def get_champion_changes(patch_note_page):
                         'r_ability': []
                     }
 
+                    champion_changes[change.text.strip()]['description'] = get_description_changes(patch_note_page, champion)
                     champion_changes[change.text.strip()]['base_stats'] = get_base_stats_changes(patch_note_page, champion)
                     champion_changes[change.text.strip()]['passive'] = get_passive_changes(patch_note_page, champion) 
                     champion_changes[change.text.strip()]['q_ability'] = get_q_changes(patch_note_page, champion)
                     champion_changes[change.text.strip()]['w_ability'] = get_w_changes(patch_note_page, champion)
                     champion_changes[change.text.strip()]['e_ability'] = get_e_changes(patch_note_page, champion)
                     champion_changes[change.text.strip()]['r_ability'] = get_r_changes(patch_note_page, champion)
-
 
      return champion_changes
 
@@ -159,6 +162,18 @@ def get_base_stats_changes(patch_note_page, champion):
 
      return base_stats_changes
 
+def get_description_changes(patch_note_page, champion):
+          
+     champion_tag = get_champion_tag(patch_note_page, champion)
+     
+     description = champion_tag.find_next('blockquote', class_="blockquote context")
+     description = description.text.strip()
+     
+     if description:
+          return "".join(desc for desc in description)
+     else:
+          return []
+     
 def get_passive_changes(patch_note_page, champion):
      
      passive_changes = []
@@ -323,7 +338,7 @@ def main():
      
      patch_note_links = get_patch_notes()
      
-     for link in patch_note_links[3:4]:
+     for link in patch_note_links[0:1]:
           print(get_title(link))
           print(get_patch_notes_num(link))
           print(get_datePosted(link))
