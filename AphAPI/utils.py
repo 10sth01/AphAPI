@@ -162,26 +162,20 @@ def get_passive_changes(patch_note_page, champion):
      champions.remove(champion)
       
      next = champion_tag.next_element
-     check = []
 
      while (next.text not in champions):
           
           next_text = str(next.text.strip())
           if (next_text[0:9] in passive_tag):  
-               # if next.name == 'p':
-               #      while (next_text[0:7] in passive_tag):
-               #           passive_changes.append(next.string.strip())
-               #           break
                while (next.name != 'ul'):
-                    check.append(next_text)
                     next = next.next_element
                     if next.name == 'ul':
                          passive_changes.extend([li.text for li in next.find_all('li')])
-                         break
-               
+                         return passive_changes
+                         
           next = next.next_element
 
-     return passive_changes
+     return []
      
 def get_item_changes(patch_note_page):
      
@@ -217,7 +211,7 @@ def main():
      
      patch_note_links = get_patch_notes()
      
-     for link in patch_note_links[0:1]:
+     for link in patch_note_links[3:4]:
           print(get_title(link))
           print(get_patch_notes_num(link))
           print(get_datePosted(link))
