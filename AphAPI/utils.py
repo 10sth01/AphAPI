@@ -94,7 +94,11 @@ def get_champion_changes(patch_note_page):
                     }
                     
                     champion_changes[next_sibling.text.strip()]['base_stats'] = get_base_stats_changes(patch_note_page, champion)
-                    champion_changes[next_sibling.text.strip()]['passive'] = get_passive_changes(patch_note_page, champion) 
+                    champion_changes[next_sibling.text.strip()]['passive'] = get_passive_changes(patch_note_page, champion)
+                    champion_changes[next_sibling.text.strip()]['q_ability'] = get_q_changes(patch_note_page, champion)
+                    champion_changes[next_sibling.text.strip()]['w_ability'] = get_w_changes(patch_note_page, champion)
+                    champion_changes[next_sibling.text.strip()]['e_ability'] = get_e_changes(patch_note_page, champion)
+                    champion_changes[next_sibling.text.strip()]['r_ability'] = get_r_changes(patch_note_page, champion)
 
                next_sibling = next_sibling.find_next_sibling()
                                
@@ -114,6 +118,10 @@ def get_champion_changes(patch_note_page):
 
                     champion_changes[change.text.strip()]['base_stats'] = get_base_stats_changes(patch_note_page, champion)
                     champion_changes[change.text.strip()]['passive'] = get_passive_changes(patch_note_page, champion) 
+                    champion_changes[change.text.strip()]['q_ability'] = get_q_changes(patch_note_page, champion)
+                    champion_changes[change.text.strip()]['w_ability'] = get_w_changes(patch_note_page, champion)
+                    champion_changes[change.text.strip()]['e_ability'] = get_e_changes(patch_note_page, champion)
+                    champion_changes[change.text.strip()]['r_ability'] = get_r_changes(patch_note_page, champion)
 
 
      return champion_changes
@@ -172,6 +180,110 @@ def get_passive_changes(patch_note_page, champion):
                     if next.name == 'ul':
                          passive_changes.extend([li.text for li in next.find_all('li')])
                          return passive_changes
+                         
+          next = next.next_element
+
+     return []
+
+def get_q_changes(patch_note_page, champion):
+     
+     q_changes = []
+     
+     champion_tag = get_champion_tag(patch_note_page, champion)
+     
+     q_tag = ["Q -"]
+     champions = get_champions()
+     champions.remove(champion)
+      
+     next = champion_tag.next_element
+
+     while (next.text not in champions):
+          
+          next_text = str(next.text.strip())
+          if (next_text[0:3] in q_tag):  
+               while (next.name != 'ul'):
+                    next = next.next_element
+                    if next.name == 'ul':
+                         q_changes.extend([li.text for li in next.find_all('li')])
+                         return q_changes
+                         
+          next = next.next_element
+
+     return []
+
+def get_w_changes(patch_note_page, champion):
+     
+     w_changes = []
+     
+     champion_tag = get_champion_tag(patch_note_page, champion)
+     
+     w_tag = ["W -"]
+     champions = get_champions()
+     champions.remove(champion)
+      
+     next = champion_tag.next_element
+
+     while (next.text not in champions):
+          
+          next_text = str(next.text.strip())
+          if (next_text[0:3] in w_tag):  
+               while (next.name != 'ul'):
+                    next = next.next_element
+                    if next.name == 'ul':
+                         w_changes.extend([li.text for li in next.find_all('li')])
+                         return w_changes
+                         
+          next = next.next_element
+
+     return []
+
+def get_e_changes(patch_note_page, champion):
+     
+     e_changes = []
+     
+     champion_tag = get_champion_tag(patch_note_page, champion)
+     
+     e_tag = ["E -"]
+     champions = get_champions()
+     champions.remove(champion)
+      
+     next = champion_tag.next_element
+
+     while (next.text not in champions):
+          
+          next_text = str(next.text.strip())
+          if (next_text[0:3] in e_tag):  
+               while (next.name != 'ul'):
+                    next = next.next_element
+                    if next.name == 'ul':
+                         e_changes.extend([li.text for li in next.find_all('li')])
+                         return e_changes
+                         
+          next = next.next_element
+
+     return []
+
+def get_r_changes(patch_note_page, champion):
+     
+     r_changes = []
+     
+     champion_tag = get_champion_tag(patch_note_page, champion)
+     
+     r_tag = ["R -"]
+     champions = get_champions()
+     champions.remove(champion)
+      
+     next = champion_tag.next_element
+
+     while (next.text not in champions):
+          
+          next_text = str(next.text.strip())
+          if (next_text[0:3] in r_tag):  
+               while (next.name != 'ul'):
+                    next = next.next_element
+                    if next.name == 'ul':
+                         r_changes.extend([li.text for li in next.find_all('li')])
+                         return r_changes
                          
           next = next.next_element
 
